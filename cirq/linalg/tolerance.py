@@ -36,7 +36,7 @@ def all_close(a, b, rtol: float = DEFAULT_RTOL, atol: float = DEFAULT_ATOL,
 
 
 def all_near_zero(a, rtol: float = DEFAULT_RTOL, atol: float = DEFAULT_ATOL,
-              equal_nan: bool = DEFAULT_EQUAL_NAN) -> bool:
+                  equal_nan: bool = DEFAULT_EQUAL_NAN) -> bool:
     """Returns True if the given matrix approximately contains all zero elements.
 
     Args:
@@ -46,6 +46,12 @@ def all_near_zero(a, rtol: float = DEFAULT_RTOL, atol: float = DEFAULT_ATOL,
         equal_nan: Whether to compare NaN's as equal.
     """
     return all_close(a, np.zeros(np.shape(a)), rtol, atol, equal_nan)
+
+
+def all_near_zero_mod(a, period, rtol: float = DEFAULT_RTOL, atol: float = DEFAULT_ATOL,
+                      equal_nan: bool = DEFAULT_EQUAL_NAN):
+    return all_close((np.array(a) + (period / 2)) % period - period / 2,
+                     np.zeros(np.shape(a)), rtol, atol, equal_nan)
 
 
 class Tolerance:
@@ -85,8 +91,7 @@ class Tolerance:
         return all_near_zero(a, self.rtol, self.atol, self.equal_nan)
 
     def all_near_zero_mod(self, a, period):
-        return self.all_close((np.array(a) + (period / 2)) % period - period / 2,
-                              np.zeros(np.shape(a)))
+        return all_near_zero_mod(a, period, self.rtol, self.atol, self.equal_nan)
 
     # Scalar methods
     def close(self, a, b):
