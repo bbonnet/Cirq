@@ -54,6 +54,19 @@ def all_near_zero_mod(a, period, rtol: float = DEFAULT_RTOL, atol: float = DEFAU
                      np.zeros(np.shape(a)), rtol, atol, equal_nan)
 
 
+def close(a, b, rtol: float = DEFAULT_RTOL, atol: float = DEFAULT_ATOL):
+    return abs(a - b) <= atol + rtol * abs(b)
+
+
+def near_zero(a, atol: float = DEFAULT_ATOL):
+    return abs(a) <= atol
+
+
+def near_zero_mod(a, period, atol: float = DEFAULT_ATOL):
+    half_period = period / 2
+    return near_zero((a + half_period) % period - half_period, atol)
+
+
 class Tolerance:
     """Specifies thresholds for doing approximate equality."""
 
@@ -95,14 +108,13 @@ class Tolerance:
 
     # Scalar methods
     def close(self, a, b):
-        return abs(a - b) <= self.atol + self.rtol * abs(b)
+        return close(a, b, atol=self.atol, rtol=self.rtol)
 
     def near_zero(self, a):
-        return abs(a) <= self.atol
+        return near_zero(a, atol=self.atol)
 
     def near_zero_mod(self, a, period):
-        half_period = period / 2
-        return self.near_zero((a + half_period) % period - half_period)
+        return near_zero_mod(a, period, atol=self.atol)
 
     def __repr__(self):
         return "Tolerance(rtol={}, atol={}, equal_nan={})".format(
