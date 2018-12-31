@@ -16,6 +16,24 @@
 
 import numpy as np
 
+DEFAULT_RTOL: float = 1e-5
+DEFAULT_ATOL: float = 1e-8
+DEFAULT_EQUAL_NAN: bool = False
+
+
+def all_close(a, b, rtol: float = DEFAULT_RTOL, atol: float = DEFAULT_ATOL,
+              equal_nan: bool = DEFAULT_EQUAL_NAN) -> bool:
+    """Returns whether the given matrices are approximately equal within the specified tolerance parameters.
+
+    Args:
+        a: First matrix to compare.
+        b: Second matrix to compare.
+        rtol: Relative tolerance.
+        atol: Absolute tolerance.
+        equal_nan: Whether to compare NaN's as equal.
+    """
+    return np.allclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
+
 
 class Tolerance:
     """Specifies thresholds for doing approximate equality."""
@@ -48,14 +66,13 @@ class Tolerance:
 
     # Matrix methods
     def all_close(self, a, b):
-        return np.allclose(
-            a, b, rtol=self.rtol, atol=self.atol, equal_nan=self.equal_nan)
+        return all_close(a, b, self.rtol, self.atol)
 
     def all_near_zero(self, a):
         return self.all_close(a, np.zeros(np.shape(a)))
 
     def all_near_zero_mod(self, a, period):
-        return self.all_close((np.array(a) + (period/2)) % period - period/2,
+        return self.all_close((np.array(a) + (period / 2)) % period - period / 2,
                               np.zeros(np.shape(a)))
 
     # Scalar methods
