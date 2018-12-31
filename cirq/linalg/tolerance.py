@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A type for specifying thresholds for doing approximate equality."""
+"""Utility methods for testing approximate equality of matrices and scalars within specified tolerances."""
 
 import numpy as np
 
