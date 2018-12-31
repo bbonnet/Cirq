@@ -35,6 +35,19 @@ def all_close(a, b, rtol: float = DEFAULT_RTOL, atol: float = DEFAULT_ATOL,
     return np.allclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
 
 
+def all_near_zero(a, rtol: float = DEFAULT_RTOL, atol: float = DEFAULT_ATOL,
+              equal_nan: bool = DEFAULT_EQUAL_NAN) -> bool:
+    """Returns True if the given matrix approximately contains all zero elements.
+
+    Args:
+        a: Matrix to evaluate.
+        rtol: Relative tolerance.
+        atol: Absolute tolerance.
+        equal_nan: Whether to compare NaN's as equal.
+    """
+    return all_close(a, np.zeros(np.shape(a)), rtol, atol, equal_nan)
+
+
 class Tolerance:
     """Specifies thresholds for doing approximate equality."""
 
@@ -69,7 +82,7 @@ class Tolerance:
         return all_close(a, b, self.rtol, self.atol)
 
     def all_near_zero(self, a):
-        return self.all_close(a, np.zeros(np.shape(a)))
+        return all_near_zero(a, self.rtol, self.atol, self.equal_nan)
 
     def all_near_zero_mod(self, a, period):
         return self.all_close((np.array(a) + (period / 2)) % period - period / 2,
