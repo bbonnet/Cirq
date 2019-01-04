@@ -20,18 +20,19 @@ import numpy as np
 
 from cirq.linalg import combinators
 from cirq.linalg import predicates
-from cirq.linalg.tolerance import Tolerance, DEFAULT_RTOL, DEFAULT_ATOL, all_close, all_near_zero
+from cirq.linalg.tolerance import DEFAULT_RTOL, DEFAULT_ATOL, all_close, all_near_zero
 
 
 def diagonalize_real_symmetric_matrix(
         matrix: np.ndarray,
-        tolerance: Tolerance = Tolerance.DEFAULT
-) -> np.ndarray:
+        rtol: float = DEFAULT_RTOL,
+        atol: float = DEFAULT_ATOL) -> np.ndarray:
     """Returns an orthogonal matrix that diagonalizes the given matrix.
 
     Args:
         matrix: A real symmetric matrix to diagonalize.
-        tolerance: Numeric error thresholds.
+        rtol: float = DEFAULT_RTOL,
+        atol: float = DEFAULT_ATOL
 
     Returns:
         An orthogonal matrix P such that P.T @ matrix @ P is diagonal.
@@ -40,6 +41,7 @@ def diagonalize_real_symmetric_matrix(
         ValueError: Matrix isn't real symmetric.
     """
 
+    # TODO: Determine if thresholds should be passed into is_hermitian
     if np.any(np.imag(matrix) != 0) or not predicates.is_hermitian(matrix):
         raise ValueError('Input must be real and symmetric.')
 

@@ -13,10 +13,10 @@
 # limitations under the License.
 
 import cmath
+
 import numpy as np
 
 import cirq
-from cirq import Tolerance
 
 
 def test_is_diagonal():
