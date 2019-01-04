@@ -23,6 +23,7 @@ import re
 import numpy as np
 
 from cirq import ops, linalg, protocols, value
+from cirq.linalg.tolerance import DEFAULT_ATOL
 
 
 class QasmUGate(ops.SingleQubitGate):
@@ -45,15 +46,15 @@ class QasmUGate(ops.SingleQubitGate):
     def from_matrix(mat: np.array) -> 'QasmUGate':
         pre_phase, rotation, post_phase = (
             linalg.deconstruct_single_qubit_matrix_into_angles(mat))
-        return QasmUGate(pre_phase/np.pi, rotation/np.pi, post_phase/np.pi)
+        return QasmUGate(pre_phase / np.pi, rotation / np.pi, post_phase / np.pi)
 
     def _qasm_(self,
                qubits: Tuple[ops.QubitId, ...],
                args: protocols.QasmArgs) -> str:
         args.validate_version('2.0')
         return args.format(
-                'u3({0:half_turns},{1:half_turns},{2:half_turns}) {3};\n',
-                self.theta, self.phi, self.lmda, qubits[0])
+            'u3({0:half_turns},{1:half_turns},{2:half_turns}) {3};\n',
+            self.theta, self.phi, self.lmda, qubits[0])
 
     def __repr__(self) -> str:
         return 'cirq.QasmUGate({}, {}, {})'.format(self.lmda,
@@ -78,7 +79,7 @@ class QasmTwoQubitGate(ops.TwoQubitGate):
         return self.kak
 
     @staticmethod
-    def from_matrix(mat: np.array, atol=1e-8) -> 'QasmTwoQubitGate':
+    def from_matrix(mat: np.array, atol=DEFAULT_ATOL) -> 'QasmTwoQubitGate':
         """Creates a QasmTwoQubitGate from the given matrix.
 
         Args:
@@ -88,7 +89,7 @@ class QasmTwoQubitGate(ops.TwoQubitGate):
         Returns:
             A QasmTwoQubitGate implementing the matrix.
         """
-        kak = linalg.kak_decomposition(mat ,atol=atol)
+        kak = linalg.kak_decomposition(mat, atol=atol)
         return QasmTwoQubitGate(kak)
 
     def _unitary_(self):
@@ -105,13 +106,13 @@ class QasmTwoQubitGate(ops.TwoQubitGate):
         yield QasmUGate.from_matrix(b0).on(q0)
         yield QasmUGate.from_matrix(b1).on(q1)
 
-        yield ops.X(q0)**0.5
+        yield ops.X(q0) ** 0.5
         yield ops.CNOT(q0, q1)
-        yield ops.X(q0)**a
-        yield ops.Y(q1)**b
+        yield ops.X(q0) ** a
+        yield ops.Y(q1) ** b
         yield ops.CNOT(q1, q0)
-        yield ops.X(q1)**-0.5
-        yield ops.Z(q1)**c
+        yield ops.X(q1) ** -0.5
+        yield ops.Z(q1) ** c
         yield ops.CNOT(q0, q1)
 
         a0, a1 = self.kak.single_qubit_operations_after
@@ -150,7 +151,7 @@ class QasmOutput:
             meas_key_id_map=meas_key_id_map)
 
     def _generate_measurement_ids(self
-            ) -> Tuple[Dict[str, str], Dict[str, Optional[str]]]:
+                                  ) -> Tuple[Dict[str, str], Dict[str, Optional[str]]]:
         # Pick an id for the creg that will store each measurement
         meas_key_id_map = {}  # type: Dict[str, str]
         meas_comments = {}  # type: Dict[str, Optional[str]]
@@ -181,6 +182,7 @@ class QasmOutput:
         with open(path, 'w') as f:
             def write(s: str) -> None:
                 f.write(s)
+
             self._write_qasm(write)
 
     def __str__(self) -> str:
@@ -194,8 +196,10 @@ class QasmOutput:
 
         # Generate nice line spacing
         line_gap = [0]
+
         def output_line_gap(n):
             line_gap[0] = max(line_gap[0], n)
+
         def output(text):
             if line_gap[0] > 0:
                 output_func('\n' * line_gap[0])
@@ -234,7 +238,7 @@ class QasmOutput:
                 output('creg {}[{}];\n'.format(meas_id, len(meas.qubits)))
             else:
                 output('creg {}[{}];  // Measurement: {}\n'.format(
-                            meas_id, len(meas.qubits), comment))
+                    meas_id, len(meas.qubits), comment))
         output_line_gap(2)
 
         # Operations

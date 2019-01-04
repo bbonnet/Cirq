@@ -54,7 +54,10 @@ from cirq.linalg.predicates import (
 from cirq.linalg.tolerance import (
     all_close,
     all_near_zero,
-    all_near_zero_mod
+    all_near_zero_mod,
+    close,
+    near_zero,
+    near_zero_mod
 )
 from cirq.linalg.transformations import (
     apply_matrix_to_slices,
